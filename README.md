@@ -1,0 +1,2 @@
+# coinbase
+Coinbase stoploss automation
