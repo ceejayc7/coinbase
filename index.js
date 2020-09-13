@@ -16,7 +16,7 @@ const setStoploss = (input) => {
 
     const what =
       bodyString === '{}' ? timestamp + method + path : timestamp + method + path + bodyString;
-    const key = Buffer(process.env.SECRET_KEY, 'base64');
+    const key = Buffer.from(process.env.SECRET_KEY, 'base64');
     const hmac = crypto.createHmac('sha256', key);
 
     return hmac.update(what).digest('base64');
@@ -35,7 +35,7 @@ const setStoploss = (input) => {
   };
   const signature = signMessage(method, endpoint, body, timestamp);
 
-  superagent
+  return superagent
     .post(`${process.env.ENDPOINT}${endpoint}`)
     .set('CB-ACCESS-KEY', process.env.ACCESS_KEY)
     .set('CB-ACCESS-SIGN', signature)
@@ -48,19 +48,25 @@ const setStoploss = (input) => {
     )
     .send(body)
     .then((data) => {
-      console.log(data.status);
+      console.log('SUCCESS');
+      console.log(`Status code: ${data.status}`);
       console.log(data.body);
       process.exit();
     })
     .catch((err) => {
-      console.log(err.status);
+      console.log('ERROR');
+      console.log(`Status code: ${err.status}`);
       console.log(err.response.body);
+      process.exit();
     });
 };
 
 (async () => {
   const input = await prompts(questions);
-  console.log(input); // do some price validiate to make sure this is a legit order
+  console.log(input);
+  console.log(
+    `When ${input.pair} trades to ${input.orderPrice}, execute a STOPLOSS order at ${input.slStopPrice} with amount ${input.slAmount} and limit sell price ${input.slLimitPrice}`
+  );
 
   const ws = new WebSocket(process.env.WS);
 
