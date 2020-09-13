@@ -1,0 +1,29 @@
+{
+  "name": "coinbase",
+  "version": "1.0.0",
+  "description": "coinbase stoploss automation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "cross-env NODE_ENV=dev node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ceejayc7/coinbase.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ceejayc7/coinbase/issues"
+  },
+  "homepage": "https://github.com/ceejayc7/coinbase#readme",
+  "dependencies": {
+    "dotenv": "8.2.0",
+    "prompts": "2.3.2",
+    "superagent": "6.1.0",
+    "ws": "7.3.1"
+  },
+  "devDependencies": {
+    "cross-env": "7.0.2"
+  }
+}
