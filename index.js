@@ -8,6 +8,38 @@ const { questions, subscription } = require('./config');
 const envFile = process.env.NODE_ENV === 'dev' ? `.envdev` : '.env';
 console.log(`Running on ${envFile}`);
 dotenv.config({ path: envFile });
+let input;
+
+const startWebsocket = () => {
+  let ws = new WebSocket(process.env.WS);
+  ws.on('open', () => {
+    ws.send(JSON.stringify(subscription));
+  });
+
+  ws.on('message', (data) => {
+    const json = JSON.parse(data);
+    const pair = json.product_id;
+    const price = parseFloat(json.price);
+    if (pair === input.pair && price <= input.orderPrice) {
+      setStoploss(input);
+    }
+  });
+
+  ws.on('error', (data) => {
+    console.log('ERROR');
+    console.log(data);
+  });
+
+  ws.on('close', (code, reason) => {
+    console.log('closed');
+    console.log(code);
+    console.log(reason);
+    // connection closed, discard old websocket and create a new one in 5s
+    ws = null;
+    setTimeout(startWebsocket, 5000);
+    startWebsocket();
+  });
+};
 
 const setStoploss = (input) => {
   // https://docs.pro.coinbase.com/#signing-a-message
@@ -62,29 +94,10 @@ const setStoploss = (input) => {
 };
 
 (async () => {
-  const input = await prompts(questions);
+  input = await prompts(questions);
   console.log(input);
   console.log(
     `When ${input.pair} trades to ${input.orderPrice}, execute a STOPLOSS order at ${input.slStopPrice} with amount ${input.slAmount} and limit sell price ${input.slLimitPrice}`
   );
-
-  const ws = new WebSocket(process.env.WS);
-
-  ws.on('open', () => {
-    ws.send(JSON.stringify(subscription));
-  });
-
-  ws.on('message', (data) => {
-    const json = JSON.parse(data);
-    const pair = json.product_id;
-    const price = parseFloat(json.price);
-    if (pair === input.pair && price <= input.orderPrice) {
-      setStoploss(input);
-    }
-  });
-
-  ws.on('error', (data) => {
-    console.log('ERROR');
-    console.log(data);
-  });
+  startWebsocket();
 })();

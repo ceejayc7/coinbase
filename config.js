@@ -3,7 +3,7 @@ const questions = [
     type: 'text',
     name: 'pair',
     message: 'What pair are you trading? (i.e., BTC-USD or ETH-USD)',
-    validate: (value) => (value === 'BTC-USD' || value === 'ETC-USD' ? true : false)
+    validate: (value) => (value === 'BTC-USD' || value === 'ETH-USD' ? true : false)
   },
   {
     type: 'number',
