@@ -9,9 +9,10 @@ const envFile = process.env.NODE_ENV === 'dev' ? `.envdev` : '.env';
 console.log(`Running on ${envFile}`);
 dotenv.config({ path: envFile });
 let input;
+let ws;
 
 const startWebsocket = () => {
-  let ws = new WebSocket(process.env.WS);
+  ws = new WebSocket(process.env.WS);
   ws.on('open', () => {
     ws.send(JSON.stringify(subscription));
   });
